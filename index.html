@@ -38,6 +38,16 @@
       'Manager 3': 'images/manager3.jpg'
     };
 
+    // PRELOAD IMAGES: Create an object to store preloaded images.
+    const preloadedImages = {};
+    managers.forEach(manager => {
+      if (headshotImages[manager]) {
+        const img = new Image();
+        img.src = headshotImages[manager];
+        preloadedImages[manager] = img;
+      }
+    });
+
     // Register a Chart.js plugin to overlay headshots at the end of each bar
     Chart.register({
       id: 'headshotOverlay',
@@ -47,28 +57,24 @@
           const meta = chart.getDatasetMeta(datasetIndex);
           meta.data.forEach((bar, index) => {
             const manager = chart.data.labels[index];
-            const imgSrc = headshotImages[manager];
-            if (!imgSrc) return;
-            const image = new Image();
-            image.src = imgSrc;
+            const image = preloadedImages[manager];
+            if (!image) return;
+            // Ensure the image has loaded
+            if (!image.complete) return;
             const imageSize = 100; // headshot size in pixels
             const offset = 50;     // gap between the bar end and the image
 
-            // When the image loads, draw it on the canvas.
-            image.onload = function() {
-              // For a horizontal bar, bar.x gives the end position of the bar and bar.y is the vertical center.
-              ctx.drawImage(image, bar.x + offset, bar.y - imageSize / 2, imageSize, imageSize);
-            }
+            // Draw the preloaded image on the canvas
+            ctx.drawImage(image, bar.x + offset, bar.y - imageSize / 2, imageSize, imageSize);
           });
         });
       }
     });
 
-
     // Get the context of the canvas element
     const ctx = document.getElementById('donationChart').getContext('2d');
 
-    // Create a horizontal bar chart
+    // Create a horizontal bar chart with data labels and disabled tooltips
     const donationChart = new Chart(ctx, {
       type: 'bar',
       data: {
