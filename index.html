@@ -26,8 +26,42 @@
 
   <script>
     // Define sample data for managers and their donation amounts
-    const managers = ['Manager 1', 'Manager 2', 'Manager 3'];
+    const managers = ['Jim Laveck', 'Jenn Moore', 'Manager 3'];
     const donations = [1200, 800, 1500]; // example donation amounts in dollars
+
+    // Define headshot image paths for each manager (ensure these images are in your repository)
+    const headshotImages = {
+      'Jim Laveck': 'images/Jim Laveck.jpg',
+      'Jenn Moore': 'images/Jenn Moore.jpg',
+      'Manager 3': 'images/manager3.jpg'
+    };
+
+    // Register a Chart.js plugin to overlay headshots at the end of each bar
+    Chart.register({
+      id: 'headshotOverlay',
+      afterDatasetsDraw(chart, args, pluginOptions) {
+        const { ctx } = chart;
+        chart.data.datasets.forEach((dataset, datasetIndex) => {
+          const meta = chart.getDatasetMeta(datasetIndex);
+          meta.data.forEach((bar, index) => {
+            const manager = chart.data.labels[index];
+            const imgSrc = headshotImages[manager];
+            if (!imgSrc) return;
+            const image = new Image();
+            image.src = imgSrc;
+            const imageSize = 30; // headshot size in pixels
+            const offset = 5;     // gap between the bar end and the image
+
+            // When the image loads, draw it on the canvas.
+            image.onload = function() {
+              // For a horizontal bar, bar.x gives the end position of the bar and bar.y is the vertical center.
+              ctx.drawImage(image, bar.x + offset, bar.y - imageSize / 2, imageSize, imageSize);
+            }
+          });
+        });
+      }
+    });
+
 
     // Get the context of the canvas element
     const ctx = document.getElementById('donationChart').getContext('2d');
