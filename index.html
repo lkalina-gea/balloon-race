@@ -6,6 +6,8 @@
   <title>Logistics Balloon Race Tracker</title>
   <!-- Load Chart.js from CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Load Chart.js Data Labels plugin -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -81,6 +83,20 @@
       },
       options: {
         indexAxis: 'y', // This makes the bar graph horizontal
+        plugins: {
+          tooltip: {
+            enabled: false  // Disable hover tooltips
+          },
+          datalabels: {
+            color: '#000',
+            anchor: 'end',
+            align: 'right',
+            formatter: (value) => '$' + value,
+            font: {
+              weight: 'bold'
+            }
+          }
+        },
         scales: {
           x: {
             beginAtZero: true,
@@ -90,7 +106,8 @@
             }
           }
         }
-      }
+      },
+      plugins: [ChartDataLabels] // Register the datalabels plugin for this chart
     });
   </script>
 </body>
