@@ -49,9 +49,11 @@
       }
     });
 
-    // Register a Chart.js plugin to overlay headshots at the end of each bar
+    // Register a Chart.js plugin to overlay headshots at the end of each bar.
+    // The key change here is adding "order: -1" so that this plugin draws before the datalabels plugin.
     Chart.register({
       id: 'headshotOverlay',
+      order: -1,  // ensures this plugin runs before ChartDataLabels
       afterDatasetsDraw(chart, args, pluginOptions) {
         const { ctx } = chart;
         chart.data.datasets.forEach((dataset, datasetIndex) => {
