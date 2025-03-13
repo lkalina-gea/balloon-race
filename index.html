@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Donation Competition Tracker</title>
+  <!-- Load Chart.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 20px;
+    }
+    #chart-container {
+      width: 80%;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Donation Competition Tracker</h1>
+  <div id="chart-container">
+    <canvas id="donationChart"></canvas>
+  </div>
+
+  <script>
+    // Define sample data for managers and their donation amounts
+    const managers = ['Manager 1', 'Manager 2', 'Manager 3'];
+    const donations = [1200, 800, 1500]; // example donation amounts in dollars
+
+    // Get the context of the canvas element
+    const ctx = document.getElementById('donationChart').getContext('2d');
+
+    // Create a horizontal bar chart
+    const donationChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: managers,
+        datasets: [{
+          label: '$ Donations',
+          data: donations,
+          backgroundColor: 'rgba(54, 162, 235, 0.6)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        indexAxis: 'y', // This makes the bar graph horizontal
+        scales: {
+          x: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: '$ Amount'
+            }
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
