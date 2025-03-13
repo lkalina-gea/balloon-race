@@ -43,7 +43,8 @@
     managers.forEach(manager => {
       if (headshotImages[manager]) {
         const img = new Image();
-        img.src = headshotImages[manager];
+        // Use encodeURI to handle spaces in filenames
+        img.src = encodeURI(headshotImages[manager]);
         preloadedImages[manager] = img;
       }
     });
@@ -70,6 +71,9 @@
         });
       }
     });
+
+    // Register the ChartDataLabels plugin globally to ensure datalabels are drawn
+    Chart.register(ChartDataLabels);
 
     // Get the context of the canvas element
     const ctx = document.getElementById('donationChart').getContext('2d');
@@ -112,8 +116,7 @@
             }
           }
         }
-      },
-      plugins: [ChartDataLabels] // Register the datalabels plugin for this chart
+      }
     });
   </script>
 </body>
