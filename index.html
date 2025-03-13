@@ -14,22 +14,44 @@
       text-align: center;
       margin: 20px;
     }
+    /* Flex container to hold headshots and chart side-by-side */
+    #tracker-container {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    /* Headshots container styling */
+    #headshots {
+      margin-right: 20px;
+    }
+    #headshots img {
+      width: 100px;
+      margin-bottom: 20px;
+      border-radius: 50%;
+    }
+    /* Chart container can expand */
     #chart-container {
-      width: 80%;
-      margin: 0 auto;
+      flex-grow: 1;
     }
   </style>
 </head>
 <body>
   <h1>Logistics Balloon Race Tracker</h1>
-  <div id="chart-container">
-    <canvas id="donationChart"></canvas>
+  <div id="tracker-container">
+    <!-- Container for headshot images -->
+    <div id="headshots">
+      <!-- Headshots will be added here via JavaScript -->
+    </div>
+    <!-- Container for the chart -->
+    <div id="chart-container">
+      <canvas id="donationChart"></canvas>
+    </div>
   </div>
 
   <script>
     // Define sample data for managers and their donation amounts
     const managers = ['Jim', 'Jenn', 'Adam', 'David', 'Melinda'];
-    const donations = [1200, 800, 1500, 0, 0, 0]; // example donation amounts in dollars
+    const donations = [1200, 800, 1500, 0, 0]; // example donation amounts in dollars
 
     // Define headshot image paths for each manager (ensure these images are in your repository)
     const headshotImages = {
@@ -40,37 +62,22 @@
       'Melinda': 'images/Melinda.jpg'
     };
 
-    // Register a Chart.js plugin to overlay headshots at the end of each bar
-    Chart.register({
-      id: 'headshotOverlay',
-      afterDatasetsDraw(chart, args, pluginOptions) {
-        const { ctx } = chart;
-        chart.data.datasets.forEach((dataset, datasetIndex) => {
-          const meta = chart.getDatasetMeta(datasetIndex);
-          meta.data.forEach((bar, index) => {
-            const manager = chart.data.labels[index];
-            const imgSrc = headshotImages[manager];
-            if (!imgSrc) return;
-            const image = new Image();
-            image.src = imgSrc;
-            const imageSize = 100; // headshot size in pixels
-            const offset = 50;     // gap between the bar end and the image
-
-            // When the image loads, draw it on the canvas.
-            image.onload = function() {
-              // For a horizontal bar, bar.x gives the end position of the bar and bar.y is the vertical center.
-              ctx.drawImage(image, bar.x + offset, bar.y - imageSize / 2, imageSize, imageSize);
-            }
-          });
-        });
-      }
+    // Add headshot images to the left column
+    const headshotsContainer = document.getElementById('headshots');
+    managers.forEach(manager => {
+      const img = document.createElement('img');
+      img.src = headshotImages[manager];
+      img.alt = manager;
+      headshotsContainer.appendChild(img);
     });
 
+    // Register the ChartDataLabels plugin globally so that data labels are drawn
+    Chart.register(ChartDataLabels);
 
     // Get the context of the canvas element
     const ctx = document.getElementById('donationChart').getContext('2d');
 
-    // Create a horizontal bar chart
+    // Create a horizontal bar chart with data labels and disabled tooltips
     const donationChart = new Chart(ctx, {
       type: 'bar',
       data: {
@@ -84,10 +91,10 @@
         }]
       },
       options: {
-        indexAxis: 'y', // This makes the bar graph horizontal
+        indexAxis: 'y', // Makes the chart horizontal
         plugins: {
           tooltip: {
-            enabled: false  // Disable hover tooltips
+            enabled: false // Disable hover tooltips
           },
           datalabels: {
             color: '#000',
@@ -108,8 +115,7 @@
             }
           }
         }
-      },
-      plugins: [ChartDataLabels] // Register the datalabels plugin for this chart
+      }
     });
   </script>
 </body>
