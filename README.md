@@ -32,6 +32,8 @@ Update the logo, title, and subtitle:
         <p>Vote for a leader to win by donating (here)! The leader with the highest donations will "win" a pie in the face on (date). All donations go to (charity). This tracker will be updated (frequency).</p>
 ```
 
+Update the styling as desired.
+
 Host the webpage with [GitHub Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site) or similar.
 
 
