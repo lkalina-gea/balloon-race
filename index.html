@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Logistics Balloon Race Tracker</title>
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    /* Optional custom styling */
+    /* Container for each row ("track") */
     .track-container {
       height: 120px;
       background-color: #f8f9fa;
@@ -15,21 +15,34 @@
       margin-bottom: 1rem;
       border: 1px solid #dee2e6;
       border-radius: 0.25rem;
+      overflow: hidden;
     }
+    /* The colored bar fill to the left of the headshot */
+    .bar-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      z-index: 1;
+    }
+    /* Manager image styling */
     .manager-img {
       position: absolute;
       top: 10px;
       height: 100px;
       width: auto;
       border-radius: 50%;
+      z-index: 2;
     }
+    /* Donation label styling */
     .donation-label {
       position: absolute;
       top: 80px;
-      background: rgba(255,255,255,0.8);
+      background: rgba(255, 255, 255, 0.8);
       padding: 2px 5px;
       border-radius: 5px;
       font-weight: bold;
+      z-index: 2;
     }
   </style>
 </head>
@@ -46,12 +59,16 @@
       { name: 'Jenn', donation: 800, image: 'images/Jenn.jpg' },
       { name: 'Adam', donation: 1500, image: 'images/Adam.jpg' },
       { name: 'David', donation: 0, image: 'images/David.jpg' },
-      { name: 'Melinda', donation: 0, image: 'images/Melinda.jpg' }
+      { name: 'Melinda', donation: 0, image: 'images/Melinda.jpg' },
+      // Additional manager placeholders
+      { name: 'Manager 6', donation: 1000, image: 'images/manager.png' },
+      { name: 'Manager 7', donation: 1000, image: 'images/manager.png' },
+      { name: 'Manager 8', donation: 1000, image: 'images/manager.png' }
     ];
     
     // Calculate the maximum donation (to use as the baseline for positioning)
     const maxDonation = Math.max(...managerData.map(m => m.donation));
-    // Define the maximum left offset in percentage (i.e., if donation is 0, the image is shifted 80% to the right)
+    // Define the maximum left offset in percentage for the highest donation.
     const maxOffsetPercent = 80;
     
     // Get the container where we'll inject the rows
@@ -59,11 +76,11 @@
     
     // For each manager, create a Bootstrap row with a track container
     managerData.forEach(manager => {
-      // Compute left offset: Highest donation => 0% offset; lower donation increases offset up to maxOffsetPercent.
-      const offsetPercent = maxDonation === 0 ? maxOffsetPercent 
-        : (1 - (manager.donation / maxDonation)) * maxOffsetPercent;
+      // Compute left offset: donation/maxDonation * maxOffsetPercent.
+      // If maxDonation is 0, default to 0%.
+      const offsetPercent = maxDonation === 0 ? 0 : (manager.donation / maxDonation) * maxOffsetPercent;
       
-      // Create a row
+      // Create a row for the manager
       const row = document.createElement('div');
       row.className = 'row align-items-center';
       
@@ -75,6 +92,13 @@
       const trackContainer = document.createElement('div');
       trackContainer.className = 'track-container';
       
+      // Create the colored bar fill element with width = offsetPercent%
+      const barFill = document.createElement('div');
+      barFill.className = 'bar-fill';
+      barFill.style.width = offsetPercent + '%';
+      // Use #489FDF if this manager is "winning", otherwise use #003C71
+      barFill.style.backgroundColor = (manager.donation === maxDonation) ? "#489FDF" : "#003C71";
+      
       // Create the manager image with dynamic left offset
       const img = document.createElement('img');
       img.src = manager.image;
@@ -82,15 +106,18 @@
       img.className = 'manager-img';
       img.style.left = offsetPercent + '%';
       
-      // Create the donation label
+      // Create the donation label with the same left offset
       const label = document.createElement('div');
       label.className = 'donation-label';
       label.style.left = offsetPercent + '%';
       label.innerText = '$' + manager.donation;
       
-      // Append the image and label to the track container, then build the row
+      // Append the bar fill, image, and label to the track container
+      trackContainer.appendChild(barFill);
       trackContainer.appendChild(img);
       trackContainer.appendChild(label);
+      
+      // Build the row and inject into the container
       col.appendChild(trackContainer);
       row.appendChild(col);
       trackerDiv.appendChild(row);
