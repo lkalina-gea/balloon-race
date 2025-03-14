@@ -1,121 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Logistics Balloon Race Tracker</title>
-  <!-- Load Chart.js from CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Load Chart.js Data Labels plugin -->
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin: 20px;
+    /* Optional custom styling */
+    .track-container {
+      height: 120px;
+      background-color: #f8f9fa;
+      position: relative;
+      margin-bottom: 1rem;
+      border: 1px solid #dee2e6;
+      border-radius: 0.25rem;
     }
-    /* Flex container to hold headshots and chart side-by-side */
-    #tracker-container {
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-    }
-    /* Headshots container styling */
-    #headshots {
-      margin-right: 20px;
-    }
-    #headshots img {
-      width: 100px;
-      margin-bottom: 20px;
+    .manager-img {
+      position: absolute;
+      top: 10px;
+      height: 100px;
+      width: auto;
       border-radius: 50%;
     }
-    /* Chart container can expand */
-    #chart-container {
-      flex-grow: 1;
+    .donation-label {
+      position: absolute;
+      top: 80px;
+      background: rgba(255,255,255,0.8);
+      padding: 2px 5px;
+      border-radius: 5px;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <h1>Logistics Balloon Race Tracker</h1>
-  <div id="tracker-container">
-    <!-- Container for headshot images -->
-    <div id="headshots">
-      <!-- Headshots will be added here via JavaScript -->
-    </div>
-    <!-- Container for the chart -->
-    <div id="chart-container">
-      <canvas id="donationChart"></canvas>
-    </div>
+  <div class="container mt-4" id="tracker">
+    <h1 class="mb-4">Logistics Balloon Race Tracker</h1>
+    <!-- Manager rows will be injected here -->
   </div>
 
   <script>
-    // Define sample data for managers and their donation amounts
-    const managers = ['Jim', 'Jenn', 'Adam', 'David', 'Melinda'];
-    const donations = [1200, 800, 1500, 0, 0]; // example donation amounts in dollars
-
-    // Define headshot image paths for each manager (ensure these images are in your repository)
-    const headshotImages = {
-      'Jim': 'images/Jim.jpg',
-      'Jenn': 'images/Jenn.jpg',
-      'Adam': 'images/Adam.jpg',
-      'David': 'images/David.jpg',
-      'Melinda': 'images/Melinda.jpg'
-    };
-
-    // Add headshot images to the left column
-    const headshotsContainer = document.getElementById('headshots');
-    managers.forEach(manager => {
+    // Define manager data (name, donation, and headshot image path)
+    const managerData = [
+      { name: 'Jim', donation: 1200, image: 'images/Jim.jpg' },
+      { name: 'Jenn', donation: 800, image: 'images/Jenn.jpg' },
+      { name: 'Adam', donation: 1500, image: 'images/Adam.jpg' },
+      { name: 'David', donation: 0, image: 'images/David.jpg' },
+      { name: 'Melinda', donation: 0, image: 'images/Melinda.jpg' }
+    ];
+    
+    // Calculate the maximum donation (to use as the baseline for positioning)
+    const maxDonation = Math.max(...managerData.map(m => m.donation));
+    // Define the maximum left offset in percentage (i.e., if donation is 0, the image is shifted 80% to the right)
+    const maxOffsetPercent = 80;
+    
+    // Get the container where we'll inject the rows
+    const trackerDiv = document.getElementById('tracker');
+    
+    // For each manager, create a Bootstrap row with a track container
+    managerData.forEach(manager => {
+      // Compute left offset: Highest donation => 0% offset; lower donation increases offset up to maxOffsetPercent.
+      const offsetPercent = maxDonation === 0 ? maxOffsetPercent 
+        : (1 - (manager.donation / maxDonation)) * maxOffsetPercent;
+      
+      // Create a row
+      const row = document.createElement('div');
+      row.className = 'row align-items-center';
+      
+      // Create a full-width column for the track
+      const col = document.createElement('div');
+      col.className = 'col-12';
+      
+      // Create the track container
+      const trackContainer = document.createElement('div');
+      trackContainer.className = 'track-container';
+      
+      // Create the manager image with dynamic left offset
       const img = document.createElement('img');
-      img.src = headshotImages[manager];
-      img.alt = manager;
-      headshotsContainer.appendChild(img);
-    });
-
-    // Register the ChartDataLabels plugin globally so that data labels are drawn
-    Chart.register(ChartDataLabels);
-
-    // Get the context of the canvas element
-    const ctx = document.getElementById('donationChart').getContext('2d');
-
-    // Create a horizontal bar chart with data labels and disabled tooltips
-    const donationChart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: managers,
-        datasets: [{
-          label: '$ Donations',
-          data: donations,
-          backgroundColor: 'rgba(0, 60, 113, 1)',
-          borderColor: 'rgba(0, 60, 113, 1)',
-          borderWidth: 1
-        }]
-      },
-      options: {
-        indexAxis: 'y', // Makes the chart horizontal
-        plugins: {
-          tooltip: {
-            enabled: false // Disable hover tooltips
-          },
-          datalabels: {
-            color: '#000',
-            anchor: 'end',
-            align: 'right',
-            formatter: (value) => '$' + value,
-            font: {
-              weight: 'bold'
-            }
-          }
-        },
-        scales: {
-          x: {
-            beginAtZero: true,
-            title: {
-              display: true,
-              text: '$ Amount'
-            }
-          }
-        }
-      }
+      img.src = manager.image;
+      img.alt = manager.name;
+      img.className = 'manager-img';
+      img.style.left = offsetPercent + '%';
+      
+      // Create the donation label
+      const label = document.createElement('div');
+      label.className = 'donation-label';
+      label.style.left = offsetPercent + '%';
+      label.innerText = '$' + manager.donation;
+      
+      // Append the image and label to the track container, then build the row
+      trackContainer.appendChild(img);
+      trackContainer.appendChild(label);
+      col.appendChild(trackContainer);
+      row.appendChild(col);
+      trackerDiv.appendChild(row);
     });
   </script>
 </body>
