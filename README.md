@@ -1,10 +1,10 @@
 # balloon-race
 
-A static webpage to track donation amounts in an office donation competition. In our case, the manager whose employees donated the most "won" a pie in the face.
+A static webpage to track donation amounts in an office donation competition. In our case, the manager whose employees donated the most "won" a pie in the face. This enables employees to easily check the competition status on their computer or smartphone.
 
 ## Setup
 
-Place the managers' headshot picutures and a logo image in images/. 
+Place the managers' headshot photos and a logo image in images/. 
 
 Update manager names, donation amounts, and headshot image paths in index.html:
 
