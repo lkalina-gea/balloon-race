@@ -54,6 +54,15 @@
       font-size: 0.8rem;
       z-index: 2;
     }
+    /* Donation button styling */
+    .donate-button {
+      margin-right: 1rem;
+    }
+    /* Fixed width for donation button column ensures the track containers start at the same horizontal position */
+    .donate-btn-col {
+      width: 150px;
+      flex-shrink: 0;
+    }
   </style>
 </head>
 <body>
@@ -61,28 +70,27 @@
     <!-- Header with pie image -->
     <div class="row align-items-center header-row mb-4">
       <div class="col-auto">
-        <img src="images/pie.png" alt="Pie" class="img-fluid">
+        <img src="images/hot-air-balloon.png" alt="Hot Air Balloon" class="img-fluid">
       </div>
       <div class="col">
         <h1><b>Logistics Balloon Race Tracker</b></h1>
-        <p>Vote for a leader to win by donating (here)! The leader with the highest donations will "win" a pie in the face on (date). All donations go to (charity). This tracker will be updated (frequency).</p>
+        <p>Vote for a leader to win by donating to their Benevity page! The leader with the highest donations will "win" a pie in the face (date TBD). All donations go to <a href="https://backsidelearningcenter.org/" target="_blank">Backside Learning Center</a>. This tracker will be updated each weekday.</p>
       </div>
     </div>
-    <!-- Manager rows will be injected here -->
+    <!-- Total Donations Section will be inserted here by script -->
   </div>
 
   <script>
-    // Define manager data (name, donation, and headshot image path)
+    // Define manager data with donation, headshot, bar color, and unique donation link
     const managerData = [
-      { name: 'Jim', donation: 1200, image: 'images/Jim.jpg' },
-      { name: 'Jenn', donation: 800, image: 'images/Jenn.jpg' },
-      { name: 'Adam', donation: 1500, image: 'images/Adam.jpg' },
-      { name: 'David', donation: 0, image: 'images/David.jpg' },
-      { name: 'Melinda', donation: 0, image: 'images/Melinda.jpg' },
-      // Additional manager placeholders
-      { name: 'Manager 6', donation: 1000, image: 'images/manager.png' },
-      { name: 'Manager 7', donation: 1000, image: 'images/manager.png' },
-      { name: 'Manager 8', donation: 1000, image: 'images/manager.png' }
+      { name: 'Allison', donation: 0, image: 'images/Allison.jpg', color: '#BA6B6B', donationLink: 'https://benevityapp.page.link/X8fXc1qeMj9obrMP8' },
+      { name: 'David',   donation: 0,  image: 'images/David.jpg',   color: '#D9A16C', donationLink: 'https://benevityapp.page.link/x2xvbKagdjnxTTAm7' },
+      { name: 'Mary',    donation: 0, image: 'images/Mary.jpg',    color: '#E6C75A', donationLink: 'https://benevityapp.page.link/qWaBcpJUdkZotbWd6' },
+      { name: 'Wanda',   donation: 0, image: 'images/Wanda.jpg',   color: '#F6EA8C', donationLink: 'https://benevityapp.page.link/mnsjWQY2cGe8uiPm8' },
+      { name: 'Jim',     donation: 0, image: 'images/Jim.jpg',     color: '#92C68D', donationLink: 'https://benevityapp.page.link/2JQTN6BB67nrQt9eA' },
+      { name: 'Jenn',    donation: 0,  image: 'images/Jenn.jpg',    color: '#6678C1', donationLink: 'https://benevityapp.page.link/QKgeVioqbuCCX4HN6' },
+      { name: 'Melinda', donation: 0,  image: 'images/Melinda.jpg', color: '#A18FCB', donationLink: 'https://benevityapp.page.link/MRDamnfko5KRD23x7' },
+      { name: 'Adam',    donation: 0, image: 'images/Adam.jpg',    color: '#D8A0B6', donationLink: 'https://benevityapp.page.link/uWQMi6xt38zMvNQE8' }
     ];
     
     // Calculate the maximum donation (to use as the baseline for positioning)
@@ -90,33 +98,63 @@
     // Define the maximum left offset in percentage for the highest donation.
     const maxOffsetPercent = 80;
     
-    // Get the container where we'll inject the rows
+    // Calculate total donations collected from all managers
+    const totalDonations = managerData.reduce((sum, manager) => sum + manager.donation, 0);
+    
+    // Get the container where we'll inject the header and rows
     const trackerDiv = document.getElementById('tracker');
     
-    // For each manager, create a Bootstrap row with a track container
+    // Create a new row for total donations collected and insert it below the header
+    const totalRow = document.createElement('div');
+    totalRow.className = 'row mb-4';
+    const totalCol = document.createElement('div');
+    totalCol.className = 'col';
+    totalCol.innerHTML = `<h2>Total Donations Collected: $${totalDonations}</h2>`;
+    totalRow.appendChild(totalCol);
+    
+    // Append the total donations row (after the existing header row)
+    trackerDiv.appendChild(totalRow);
+    
+    // For each manager, create a row with a donation button and a track container
     managerData.forEach(manager => {
-      // Compute left offset: donation/maxDonation * maxOffsetPercent.
+      // Compute left offset: donation / maxDonation * maxOffsetPercent.
       // If maxDonation is 0, default to 0%.
       const offsetPercent = maxDonation === 0 ? 0 : (manager.donation / maxDonation) * maxOffsetPercent;
       
-      // Create a row for the manager
+      // Create a row for the manager with a bottom margin for spacing
       const row = document.createElement('div');
-      row.className = 'row align-items-center';
+      row.className = 'row align-items-center mb-2';
       
-      // Create a full-width column for the track
-      const col = document.createElement('div');
-      col.className = 'col-12';
+      // Create the column for the donation button with fixed width
+      const buttonCol = document.createElement('div');
+      buttonCol.className = 'col-auto donate-btn-col';
+      
+      // Create the donation button as a link styled with Bootstrap's btn classes
+      const donateButton = document.createElement('a');
+      donateButton.className = 'btn btn-primary donate-button';
+      donateButton.href = manager.donationLink;
+      donateButton.target = "_blank"; // Opens link in a new tab
+      donateButton.innerText = 'Donate for ' + manager.name;
+      donateButton.style.backgroundColor = manager.color;
+      donateButton.style.border = 'none';
+      donateButton.style.color = 'black';
+      
+      // Append the donation button into its column
+      buttonCol.appendChild(donateButton);
+      
+      // Create the column for the track container (taking up remaining space)
+      const trackCol = document.createElement('div');
+      trackCol.className = 'col';
       
       // Create the track container
       const trackContainer = document.createElement('div');
       trackContainer.className = 'track-container';
       
-      // Create the colored bar fill element with width = offsetPercent%
+      // Create the colored bar fill element with width set to offsetPercent%
       const barFill = document.createElement('div');
       barFill.className = 'bar-fill';
       barFill.style.width = offsetPercent + '%';
-      // Use #489FDF if this manager is "winning", otherwise use #003C71
-      barFill.style.backgroundColor = (manager.donation === maxDonation) ? "#489FDF" : "#003C71";
+      barFill.style.backgroundColor = manager.color;
       
       // Create the manager image with dynamic left offset
       const img = document.createElement('img');
@@ -136,11 +174,20 @@
       trackContainer.appendChild(img);
       trackContainer.appendChild(label);
       
-      // Build the row and inject into the container
-      col.appendChild(trackContainer);
-      row.appendChild(col);
+      // Append the track container to its column
+      trackCol.appendChild(trackContainer);
+      
+      // Append both columns (donation button and track container) to the row
+      row.appendChild(buttonCol);
+      row.appendChild(trackCol);
+      
+      // Append the completed row to the tracker container
       trackerDiv.appendChild(row);
     });
   </script>
+  <footer class="text-center mt-4">
+    <br>
+    <p>Hot air balloon icon made by Freepik from <a href="https://www.flaticon.com/free-icon/hot-air-balloon_1926402?term=hot+air+balloon&page=1&position=3&origin=tag&related_id=1926402" target="_blank" title="hot air balloon icons">www.flaticon.com</a></p>
+  </footer>
 </body>
 </html>
